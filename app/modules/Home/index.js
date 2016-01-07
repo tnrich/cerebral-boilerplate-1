@@ -2,6 +2,7 @@ import React from 'react';
 import {Decorator as Cerebral} from 'cerebral-react';
 import Title from './components/Title';
 import Input from '../UI/Input';
+import InputWrapper from '../CerebralForm/InputWrapper';
 
 @Cerebral({
   title: ['title'],
@@ -26,6 +27,23 @@ class App extends React.Component {
         <ul>
           {this.props.todos.map(todo => <li>{todo.title}</li>)}
         </ul>
+
+        <div>
+          {InputWrapper(<input ...{this.props.input}/>, {
+            path: ['uniquePath','to','state'],
+            validations: {
+              email: (value,state) => {
+                if (value.indexOf('@') < 0) {
+                  return false
+                } else {
+                  return true
+                }
+              }
+            }, validatonErrors: {
+              email: 'not a valid email'
+            }
+          })}
+        </div>
         <h3>Falcor</h3>
         <ul>
           {Object.keys(this.props.falcorTodos).map(id => <li>{this.props.falcorTodos[id].title}</li>)}
