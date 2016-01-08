@@ -78,13 +78,13 @@ class Home extends React.Component {
         { showMore
            &&
           <div>
-          <Input2/>
           <br/>
           <Input3/>
           </div>
         }
-        <button disabled={!this.props.formCompleted}>Submit</button>
+        <br/>
         <ObjectInspector initialExpandedPaths={['root', 'root.errors']} data={ this.props } />
+        <button disabled={!this.props.formCompleted}>Submit</button>
       </div>
     );
   }
