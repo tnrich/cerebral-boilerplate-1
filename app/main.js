@@ -6,6 +6,7 @@ import {Container} from 'cerebral-react';
 
 import homeSignals from './modules/Home/signals';
 import Home from './modules/Home';
+import CerebralForm from './modules/CerebralForm';
 
 const redirectToDefaultColor = ({services}) => {
   services.router.redirect('/blue');
@@ -13,6 +14,25 @@ const redirectToDefaultColor = ({services}) => {
 
 controller.signal('rootRouted', [redirectToDefaultColor]);
 homeSignals(controller);
+
+//example validation
+var validation = {
+	email: [function checkEmail(input, state, output) {
+		if (input.value.indexOf('@') > -1) {
+			output.success()
+		} else {
+			output.error()
+		}
+	}],
+	myCustom5Validation: [function checkEmail(input, state, output) {
+		if (input.value.indexOf('5') > -1) {
+			output.success()
+		} else {
+			output.error()
+		}
+	}],
+}
+CerebralForm(controller, validation)
 
 Router(controller, {
   '/': 'rootRouted',
