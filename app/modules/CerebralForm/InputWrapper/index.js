@@ -23,7 +23,7 @@ export default function InputWrapper (ComposedComponent, options) {
               })
             },
             onBlur: (event) => {
-              this.props.signals.blur.sync({
+              this.props.signals.blur({
                 value: event.target.value,
                 ...options
               })

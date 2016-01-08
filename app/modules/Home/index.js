@@ -24,7 +24,7 @@ var ShowAnotherGroupOfInputs = InputWrapper(function ShowAnotherGroupOfInputs (p
     <br/>
       <ObjectInspector initialExpandedPaths={['root', 'root.errors']} data={ props } />
       <br/>
-      <radiogroup onChange={props.onChange}>
+      <radiogroup {...props}>
         <input type="radio" name="showOthers" value="showMore" checked={props.value==="showMore"}/> Show More <br/>
         <input type="radio" name="showOthers" value="showLess" checked={props.value==="showLess"}/> Show Less<br/>
       </radiogroup>
@@ -38,10 +38,10 @@ var Input2 = InputWrapper(function Input2 (props) {
     <br/>
       <ObjectInspector initialExpandedPaths={['root', 'root.errors']} data={ props } />
       <br/>
-      <radiogroup onChange={props.onChange}>
-        <input type="radio" name="gender2" value="male" checked={props.value==="male"}/> Male <br/>
-        <input type="radio" name="gender2" value="female" checked={props.value==="female"}/> Female<br/>
-        <input type="radio" name="gender2" value="other" checked={props.value==="other"}/> Other
+      <radiogroup {...props}>
+        <input type="radio" name="happy" value="happy" checked={props.value==="happy"}/> Happy <br/>
+        <input type="radio" name="happy" value="unhappy" checked={props.value==="unhappy"}/> Unhappy <br/>
+        <input type="radio" name="happy" value="other" checked={props.value==="other"}/> Other
       </radiogroup>
     </div>
     );
@@ -72,7 +72,6 @@ class Home extends React.Component {
     var showMore = this.props.showMore && (this.props.showMore.value === 'showMore')
     return (
       <div>
-
         <Input1/> 
         <br/>
         <ShowAnotherGroupOfInputs/> 
