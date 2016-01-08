@@ -1,5 +1,5 @@
-import inputToState from 'cerebral-addons/inputToState';
+// import inputToState from 'cerebral-addons/inputToState';
 
-export default [
-  inputToState(['color'], ['color'])
-];
+// export default [
+//   inputToState(['color'], ['color'])
+// ];

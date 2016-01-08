@@ -2,49 +2,39 @@
 import {HOC} from 'cerebral-react';
 import React, { Component } from "react";
 //take in a user component
-export default function InputWrapper (ComposedComponent, {path, validationName, validationErrors}) {
+export default function InputWrapper (ComposedComponent, options) {
   //wrap a helper component in cerebral's HOC
-  // var CerebralWrappedComponent = HOC(ComposedComponent, {})
-  // return CerebralWrappedComponent;
-  // debugger;
   return HOC(class Connector extends Component {
-      // componentWillMount() {
-      //   this.props.signals.init({path})
-      // }
+      componentWillMount() {
+        this.props.signals.init(options)
+        this.props.signals.addToForm(options)
+      }
+      componentWillUnmount() {
+        this.props.signals.removeFromForm(options)
+      }
       render() {
-        var cerebralInput = this.props.cerebralInput || {};
+        var {cerebralInput, ...other} = this.props;
         //prepare the various "bindings"
-        var input = {
+        var additionalProps = {
             onChange: (event) => {
-              this.props.signals.changed({
-                path,
+              this.props.signals.change.sync({
                 value: event.target.value,
-                validationName
+                ...options
               })
             },
-            onBlur: () => {
-              this.props.signals.blurred({
-                path,
-                validationName
+            onBlur: (event) => {
+              this.props.signals.blur.sync({
+                value: event.target.value,
+                ...options
               })
+              return true
             },
-            ...cerebralInput
-            // onFocus: () => {
-            //   debugger;
-            //   this.props.signals.focused({
-            //     path,
-            //     validationName
-            //   })
-            // },
-            // value: cerebralInput.value,
-            // com
-            // data: cerebralInput,
-            // errors: cerebralInput.errors
+            ...cerebralInput,
         }
-        return <ComposedComponent {...this.props} {...input} />;
+        return <ComposedComponent {...other} {...additionalProps} />;
       }
     }, {
-    cerebralInput: path,
+    cerebralInput: options.path,
     //we could also take in other user-defined cerebral bindings here, but it seems like they can just wrap with cerebral like normal if they need to
   })
 }

@@ -4,44 +4,42 @@ import Router from 'cerebral-router';
 import controller from './controller';
 import {Container} from 'cerebral-react';
 
-import homeSignals from './modules/Home/signals';
 import Home from './modules/Home';
 import CerebralForm from './modules/CerebralForm';
-
-const redirectToDefaultColor = ({services}) => {
-  services.router.redirect('/blue');
-}
-
-controller.signal('rootRouted', [redirectToDefaultColor]);
-homeSignals(controller);
+import validator from 'validator';
 
 //example validation
-var validation = {
-	email: [function checkEmail(input, state, output) {
-		if (input.value.indexOf('@') > -1) {
-			output.success()
-		} else {
-			output.error()
-		}
-	}],
-	myCustom5Validation: [function checkEmail(input, state, output) {
-		if (input.value.indexOf('5') > -1) {
-			output.success()
-		} else {
-			output.error()
-		}
-	}],
+var simpleValidation = {
+	...validator
 }
-CerebralForm(controller, validation)
-
-Router(controller, {
-  '/': 'rootRouted',
-  '/:color': 'colorChanged'
-}, {
-  onlyHash: true,
-  mapper: {
-    query: true
-  }
-});
+var asyncValidation = {
+	// myAsyncEmailValidation: [function checkEmail({input, output, services}) {
+	// 	services.superagent
+	// 	.post('/validateEmail')
+	// 	.send(input.value)
+	// 	.then(function(argument) {
+	// 		output.success()
+	// 	}).catch(function(err) {
+	// 		output.error()
+	// 	})
+	// }],
+	isNonGmail: function({
+		input, output
+	}) {
+		//fake talking to backend
+		setTimeout(function(argument) {
+			if (input.value.indexOf('gmail') > -1) {
+				output({
+					asyncError: {
+						message: 'The email ' + input.value + ' cannot have gmail in the name'
+					}
+				})
+			} else {
+				output()
+			}
+		}, 300)
+	}
+}
+CerebralForm(controller, simpleValidation, asyncValidation)
 
 ReactDOM.render(<Container controller={controller}><Home /></Container>, document.getElementById('root'));
