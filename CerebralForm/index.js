@@ -1,7 +1,5 @@
-import InputWrapper from './InputWrapper';
-import each from 'lodash/collection/each';
-//the module: 
-export default function(controller, simpleValidation, asyncValidation) {
+export default (options = {}) => {
+	var {simpleValidation = {}, asyncValidation={} } = options; 
 	var validationNames = [];
 	Object.keys(asyncValidation).forEach(function(key) {
 		validationNames.push(key)
@@ -10,14 +8,12 @@ export default function(controller, simpleValidation, asyncValidation) {
 		validationNames.push('noValidationGiven%%')
 	})
 	function doSimpleValidation ({input: {value, errors={}, validations={}},state,output}) {
-		each(validations, function (message, key) {
+		Object.keys(validations).forEach(function (key) {
 			var valid = simpleValidation[key](value, state)
 			if (valid) {
 				delete errors[key]
 			} else {
-				errors[key] = {
-					message
-				}
+				errors[key] = validations[key] //todo check this is okay
 			}
 		})
 		output({errors})
@@ -25,7 +21,8 @@ export default function(controller, simpleValidation, asyncValidation) {
 
 	function setValue({input, state, output}) {
 		state.set([...input.path, 'value'], input.value)
-		if (state.get([...input.path, 'visited'])) {
+		var {validateImmediately = true, visited} = state.get(input.path)
+		if (validateImmediately || visited) {
 			output.shouldValidate()
 		} else {
 			output.doNotValidate()
@@ -40,7 +37,10 @@ export default function(controller, simpleValidation, asyncValidation) {
 		})
 	}
 	chooseAsyncValidationPath.outputs = validationNames;
-	var signals = {
+	return (module) => {
+		// Add signals
+		module.alias('cerebralModuleForm');
+		module.signals({
 		init: [function({input, state}) {
 			if (!state.get(input.path)) {
 				state.set([...input.path], {
@@ -50,10 +50,22 @@ export default function(controller, simpleValidation, asyncValidation) {
 			}
 		}],
 		addToForm: [function({input, state}) {
-			state.set(['cerebralForm', input.form, 'paths', input.path.join('%.%')],true)
+			var forms = input.form
+			if (!Array.isArray(input.form)) {
+				forms = [input.form]
+			} 
+			forms.forEach(function(form){
+				state.set(['cerebralForm', form, 'paths', input.path.join('%.%')],true)
+			});
 		}],
 		removeFromForm: [function({input, state}) {
-			state.unset(['cerebralForm', input.form, 'paths', input.path.join('%.%')]);
+			var forms = input.form
+			if (!Array.isArray(input.form)) {
+				forms = [input.form]
+			}
+			forms.forEach(function(form){
+				state.unset(['cerebralForm', form, 'paths', input.path.join('%.%')],true)
+			});
 		}],
 		change: [
 			setValue, {
@@ -79,15 +91,9 @@ export default function(controller, simpleValidation, asyncValidation) {
 			chooseAsyncValidationPath,
 			asyncValidation,
 			setErrors
-		]
-	}
-	attachSignalsToController(signals, controller)
-}
-
-function attachSignalsToController(signalsObj, controller) {
-	each(signalsObj, function(actionArray, signalName) {
-		controller.signal(signalName, actionArray);
-	})
+		]});
+		return {};
+	};
 }
 
 function makeSurePathIsPresent({input, state, output}) {
@@ -126,19 +132,3 @@ export function formCompleted (formName) {
 	}
 }
 
-export {InputWrapper};
-
-//InputWrapper/index.js
-// export default function InputWrapper (ComposedComponent, options) {
-
-
-// function handleAsyncValid ({input: {asyncValidation, errors={}},output}) {
-// 	delete errors[asyncValidation];
-// 	output({errors})
-// }
-// function handleAsyncInvalid ({input: {asyncValidation, errors={}, message=''},output}) {
-// 	errors[asyncValidation] = {
-// 		message
-// 	}
-// 	output({errors})
-// }

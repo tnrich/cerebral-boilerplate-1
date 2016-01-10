@@ -1,29 +1,29 @@
 //HOC component
-import {HOC} from 'cerebral-react';
+import {HOC} from 'cerebral-view-react';
 import React, { Component } from "react";
 //take in a user component
 export default function InputWrapper (ComposedComponent, options) {
   //wrap a helper component in cerebral's HOC
   return HOC(class Connector extends Component {
       componentWillMount() {
-        this.props.signals.init(options)
-        this.props.signals.addToForm(options)
+        this.props.signals[this.props.modules.cerebralModuleForm.name].init(options)
+        this.props.signals[this.props.modules.cerebralModuleForm.name].addToForm(options)
       }
       componentWillUnmount() {
-        this.props.signals.removeFromForm(options)
+        this.props.signals[this.props.modules.cerebralModuleForm.name].removeFromForm(options)
       }
       render() {
         var {cerebralInput, ...other} = this.props;
         //prepare the various "bindings"
         var additionalProps = {
             onChange: (event) => {
-              this.props.signals.change.sync({
+              this.props.signals[this.props.modules.cerebralModuleForm.name].change.sync({
                 value: event.target.value,
                 ...options
               })
             },
             onBlur: (event) => {
-              this.props.signals.blur({
+              this.props.signals[this.props.modules.cerebralModuleForm.name].blur({
                 value: event.target.value,
                 ...options
               })
